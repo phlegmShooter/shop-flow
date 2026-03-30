@@ -1,0 +1,53 @@
+# Spring Boot配置
+server:
+  port: 8083
+
+spring:
+  application:
+    name: cart-service
+
+  # Nacos服务发现配置
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        group: ECOMMERCE_GROUP
+      config:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        import-check:
+          enabled: false
+
+  # Redis配置
+  data:
+    redis:
+      host: 192.168.1.4
+      port: 6379
+      database: 1
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# 日志配置
+logging:
+  level:
+    com.shopflow.cart: debug
+    org.springframework.web: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  file:
+    name: logs/cart-service.log
+
+# 接口文档配置
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

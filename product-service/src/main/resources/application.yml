@@ -1,0 +1,69 @@
+# Spring Boot配置
+server:
+  port: 8082
+
+spring:
+  application:
+    name: product-service
+
+  # Nacos服务发现配置
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        group: ECOMMERCE_GROUP
+      config:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        import-check:
+          enabled: false
+
+  # MySQL配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.4:3306/shopflow?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: SfDb_P@ss_2026
+
+  # Redis配置
+  data:
+    redis:
+      host: 192.168.1.4
+      port: 6379
+      database: 1
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# 日志配置
+logging:
+  level:
+    com.shopflow.product: debug
+    org.springframework.web: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  file:
+    name: logs/product-service.log
+
+# 接口文档配置
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,0 +1,132 @@
+# Spring Boot配置
+server:
+  port: 8000
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+
+  # Nacos服务发现配置
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        group: ECOMMERCE_GROUP
+      config:
+        server-addr: 192.168.1.4:8848
+        enabled: true
+        import-check:
+          enabled: false
+
+    # Gateway配置
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 用户服务路由
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=0
+
+        # 商品服务路由
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - StripPrefix=0
+
+        # 购物车服务路由
+        - id: cart-service
+          uri: lb://cart-service
+          predicates:
+            - Path=/api/cart/**
+          filters:
+            - StripPrefix=0
+
+        # 订单服务路由
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - StripPrefix=0
+
+        # 通知服务路由
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notification/**
+          filters:
+            - StripPrefix=0
+
+      # 全局跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+  # Redis配置
+  data:
+    redis:
+      host: 192.168.1.4
+      port: 6379
+      database: 1
+      timeout: 5s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# JWT配置
+jwt:
+  secret: shopflow-secret-key-2026-03-25-electronic-commerce
+  token-header: Authorization
+  token-prefix: "Bearer "
+
+# 限流配置
+rate-limit:
+  enabled: true
+  requests-per-second: 10
+  bucket-capacity: 100
+
+# 日志配置
+logging:
+  level:
+    com.shopflow.gateway: debug
+    org.springframework.cloud.gateway: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  file:
+    name: logs/gateway-service.log
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
